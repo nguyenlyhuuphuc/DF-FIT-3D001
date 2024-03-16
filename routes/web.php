@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,33 +18,16 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::get('/nguyen-van-a', function (){
-    echo 'Nguyen Van B';
-});
-
-Route::get('product/detail/{productId?}', function($productId = 1){
-    echo $productId;
-});
-
-Route::get('test', function (){
-    return view('Test.SubTest.test');
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::get('sinh-vien', function(){
-    return view('sinhvien.sinhvien');
-});
+require __DIR__.'/auth.php';
 
-Route::get('wikipedia', function(){
-    return view('wikipedia');
-});
-
-Route::get('product', function(){
-    return view('pages.product');
-});
-Route::get('about-us', function(){
-    return view('pages.about-us');
-});
-Route::get('article', function(){
-    return view('pages.article');
-});
+require __DIR__.'/admin.php';
