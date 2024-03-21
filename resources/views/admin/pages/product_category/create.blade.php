@@ -7,12 +7,12 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0 text-dark">Dashboard</h1>
+            <h1 class="m-0 text-dark">Product Category</h1>
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">Dashboard v1</li>
+              <li class="breadcrumb-item active">Product Category</li>
             </ol>
           </div><!-- /.col -->
         </div><!-- /.row -->
@@ -28,41 +28,42 @@
               <!-- general form elements -->
               <div class="card card-primary">
                 <div class="card-header">
-                  <h3 class="card-title">Quick Example</h3>
+                  <h3 class="card-title">Product Category</h3>
                 </div>
                 <!-- /.card-header -->
                 <!-- form start -->
-                <form role="form">
+                <form role="form" action="{{ route('admin.product_category.store') }}" method="POST">
                   <div class="card-body">
                     <div class="form-group">
-                      <label for="exampleInputEmail1">Email address</label>
-                      <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Enter email">
+                      <label for="name">Name</label>
+                      <input value="{{ old('name') }}" type="text" name="name" class="form-control" id="name" placeholder="Enter name">
+                      @error('name')
+                        <small class="text-danger">{{ $message }}</small>
+                      @enderror
                     </div>
                     <div class="form-group">
-                      <label for="exampleInputPassword1">Password</label>
-                      <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+                      <label for="slug">Slug</label>
+                      <input value="{{ old('slug') }}" type="text" name="slug" class="form-control" id="slug" placeholder="Enter slug">
+                      @error('slug')
+                        <small class="text-danger">{{ $message }}</small>
+                      @enderror
                     </div>
                     <div class="form-group">
-                      <label for="exampleInputFile">File input</label>
-                      <div class="input-group">
-                        <div class="custom-file">
-                          <input type="file" class="custom-file-input" id="exampleInputFile">
-                          <label class="custom-file-label" for="exampleInputFile">Choose file</label>
-                        </div>
-                        <div class="input-group-append">
-                          <span class="input-group-text" id="">Upload</span>
-                        </div>
+                      <label for="status">Status</label>
+                      <select name="status" class="custom-select" id="status">
+                        <option value="">---Please Select---</option>
+                        <option {{ old('status') == '1' ? 'selected' : '' }} value="1">Show</option>
+                        <option {{ old('status') == '0' ? 'selected' : '' }} value="0">Hide</option>
+                      </select>
+                      @error('status')
+                        <small class="text-danger">{{ $message }}</small>
+                      @enderror
                       </div>
-                    </div>
-                    <div class="form-check">
-                      <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                      <label class="form-check-label" for="exampleCheck1">Check me out</label>
-                    </div>
                   </div>
                   <!-- /.card-body -->
-  
+                  @csrf
                   <div class="card-footer">
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="submit" class="btn btn-primary">Create</button>
                   </div>
                 </form>
               </div>
@@ -73,4 +74,26 @@
     </section>
     <!-- /.content -->
   </div>
+@endsection
+
+@section('my-script')
+<script>
+  $(document).ready(function (){
+    $('#name').on('keyup', function(){
+        var nameInput = $(this).val();
+        
+        $.ajax({
+           method: "POST", //method of form
+           url: "{{ route('admin.product_category.slug') }}", //action of form
+           data: { name: nameInput, _token: "{{ csrf_token() }}" }, //input name
+           success: function (response){
+              $('#slug').val(response.slug);
+           },
+           fail: function(){
+              alert('Something went wrong with ajax slug');
+           }
+        });
+    });
+  });
+</script>
 @endsection
