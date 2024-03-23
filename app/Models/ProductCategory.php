@@ -10,4 +10,14 @@ class ProductCategory extends Model
     use HasFactory;
 
     protected $table = 'product_category';
+
+    // protected $fillable = [
+    //     'name',
+    //     'status',
+    //     'slug'
+    // ];
+
+    protected $guarded = [];
+
+    // public $timestamps = true;
 }

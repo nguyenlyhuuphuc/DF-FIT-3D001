@@ -23,6 +23,11 @@
     <!-- Main content -->
     <section class="content">
       <div class="container-fluid">
+        <ul>
+          @foreach($errors->all() as $item)
+            <li> {{ $item }}</li>
+          @endforeach
+        </ul>
         <div class="row">
             <div class="col-md-12">
               <!-- general form elements -->
@@ -48,7 +53,7 @@
                         <small class="text-danger">{{ $message }}</small>
                       @enderror
                     </div>
-                    <div class="form-group">
+                    {{-- <div class="form-group">
                       <label for="status">Status</label>
                       <select name="status" class="custom-select" id="status">
                         <option value="">---Please Select---</option>
@@ -59,7 +64,7 @@
                         <small class="text-danger">{{ $message }}</small>
                       @enderror
                       </div>
-                  </div>
+                  </div> --}}
                   <!-- /.card-body -->
                   @csrf
                   <div class="card-footer">
