@@ -53,7 +53,7 @@
                         <small class="text-danger">{{ $message }}</small>
                       @enderror
                     </div>
-                    {{-- <div class="form-group">
+                    <div class="form-group">
                       <label for="status">Status</label>
                       <select name="status" class="custom-select" id="status">
                         <option value="">---Please Select---</option>
@@ -64,7 +64,7 @@
                         <small class="text-danger">{{ $message }}</small>
                       @enderror
                       </div>
-                  </div> --}}
+                  </div>
                   <!-- /.card-body -->
                   @csrf
                   <div class="card-footer">

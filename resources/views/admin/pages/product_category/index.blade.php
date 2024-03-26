@@ -57,7 +57,13 @@
                           <td>{{ $loop->iteration }}</td>
                           <td>{{ $productCategory->name }}</td>
                           <td>{{ $productCategory->status ? 'Show' : 'Hide' }}</td>
-                          <td></td>
+                          <td>
+                            <form action="{{ route('admin.product_category.destroy', ['id' => $productCategory->id]) }}" method="post">
+                              @csrf
+                              <button onclick="return confirm('Are you sure ?')" class="btn btn-danger" type="submit">Delete</button>
+                            </form>
+                            <a href="{{ route('admin.product_category.detail', ['id' => $productCategory->id]) }}" class="btn btn-primary">Edit</a>
+                          </td>
                         </tr>
                       @endforeach
                     </tbody>
