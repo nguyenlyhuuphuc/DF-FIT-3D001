@@ -86,6 +86,8 @@
 <!-- AdminLTE for demo purposes -->
 <script src="{{ asset('admin_asset/dist/js/demo.js') }}"></script>
 
+<script src="//cdn.datatables.net/2.0.3/js/dataTables.min.js"></script>
+
 @yield('my-script')
 </body>
 </html>

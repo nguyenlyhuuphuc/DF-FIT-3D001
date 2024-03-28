@@ -16,29 +16,29 @@ use Illuminate\Support\Str;
 class ProductCategoryController extends Controller
 {
     public function index(Request $request){
-        //SQL Raw
+        // $key = $request->key ?? null;
+        // $status = $request->status ?? null;
+        // $sortBy = $request->sort_by ?? 'az';
+
+        // $productCategories = DB::table('product');
+        // //Filter
+        // if(!is_null($key)){
+        //     $productCategories->where('name', 'like', '%'.$key.'%');
+        // }
+        // if(!is_null($status)){
+        //     $productCategories->where('status', $status);
+        // }
+
+        // //Order By
+        // if($sortBy === 'az'){
+        //     $productCategories->orderBy('name', 'asc');
+        // }else if($sortBy === 'za'){
+        //     $productCategories->orderBy('name', 'desc');
+        // }
+
+        // $productCategories = $productCategories->paginate(config('my_config.item_per_page'));
+        $productCategories = ProductCategory::all();
         
-        // $queryCount = DB::select('select count(*) as total from product_category');
-
-        // $totalRecord = $queryCount[0]->total;
-        // $itemPerPage = 10;
-        // $totalPage = (int)ceil($totalRecord / $itemPerPage);
-        // $page = $request->page ?? 1;
-        // $current = ($page - 1) * $itemPerPage;
-
-        // $productCategories = DB::select('SELECT * FROM product_category Limit ?,?', [$current, $itemPerPage]);
-
-        // dd($totalPage);
-
-
-        //QueryBuilder
-        $productCategories = DB::table('product_category')->paginate(10);
-        // dd($productCategories);
-
-        //Eloquent
-        // $productCategories = ProductCategory::all();
-        // dd($productCategories);
-
         return view('admin.pages.product_category.index', ['productCategories' => $productCategories]);
     }
 

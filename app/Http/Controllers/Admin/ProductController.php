@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -12,7 +14,20 @@ class ProductController extends Controller
      */
     public function index()
     {
-        //
+        //SELECT product.*, product_category.name as 'product_category_name'
+        // FROM `product`
+        // INNER JOIN product_category on product.product_category_id = product_category.id;
+        //Query Builder 
+        // $products = DB::table('product')
+        // ->select('product.*', 'product_category.name as product_category_name')
+        // ->join('product_category', 'product.product_category_id', '=', 'product_category.id')
+        // ->paginate(config('my_config.item_per_page'));
+
+        $products = Product::with('productCategory')->paginate(10);
+        // $products = Product::paginate(config('my_config.item_per_page'));
+        // dd($products);
+
+        return view('admin.pages.product.index', ['products' => $products]);
     }
 
     /**

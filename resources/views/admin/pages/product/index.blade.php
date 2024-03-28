@@ -36,51 +36,36 @@
       <div class="container-fluid">
         <!-- Small boxes (Stat box) -->
         <div class="row">
-            {{-- <form action="{{ route('admin.product_category.index') }}" method="get">
-                Name : <input type="text" name="key" value="{{ request()->key ?? '' }}" />
-                Status :
-                <select name="status">
-                    <option {{ request()->status == '' ? 'selected' : '' }} value="">---Please select ---</option>
-                    <option {{ request()->status == '1' ? 'selected' : '' }} value="1">Show</option>
-                    <option {{ request()->status == '0' ? 'selected' : '' }} value="0">Hide</option>
-                </select>
-                Sort By :
-                <select name="sort_by">
-                  <option value="">---Please select ---</option>
-                  <option value="az">A -> Z</option>
-                  <option value="za">Z -> A</option>
-              </select>
-                <button type="submit">Search</button>
-            </form> --}}
-        </div>
-        <div class="row">
             <div class="col-md-12">
               <div class="card">
                 <div class="card-header">
                 </div>
                 <!-- /.card-header -->
                 <div class="card-body">
-                  <table class="table table-bordered" id="table-product-category">
+                  <table class="table table-bordered">
                     <thead>                  
                       <tr>
                         <th style="width: 10px">#</th>
                         <th>Name</th>
+                        <th>Category Name</th>
                         <th>Status</th>
                         <th style="width: 40px">Action</th>
                       </tr>
                     </thead>
                     <tbody>
-                      @foreach ($productCategories as $productCategory)
+                      @foreach ($products as $product)
                         <tr>
                           <td>{{ $loop->iteration }}</td>
-                          <td>{{ $productCategory->name }}</td>
-                          <td>{{ $productCategory->status ? 'Show' : 'Hide' }}</td>
+                          <td>{{ $product->name }}</td>
+                          <td>{{ $product->productCategory->name }}</td>
+                          {{-- <td>{{ $product->product_category_name }}</td> --}}
+                          <td>{{ $product->status ? 'Show' : 'Hide' }}</td>
                           <td>
-                            <form action="{{ route('admin.product_category.destroy', ['id' => $productCategory->id]) }}" method="post">
+                            <form action="{{ route('admin.product_category.destroy', ['id' => $product->id]) }}" method="post">
                               @csrf
                               <button onclick="return confirm('Are you sure ?')" class="btn btn-danger" type="submit">Delete</button>
                             </form>
-                            <a href="{{ route('admin.product_category.detail', ['id' => $productCategory->id]) }}" class="btn btn-primary">Edit</a>
+                            <a href="{{ route('admin.product_category.detail', ['id' => $product->id]) }}" class="btn btn-primary">Edit</a>
                           </td>
                         </tr>
                       @endforeach
@@ -89,15 +74,7 @@
                 </div>
                 <!-- /.card-body -->
                 <div class="card-footer clearfix">
-                  {{-- {{ $productCategories->links() }} --}}
-                  {{-- {{ $productCategories->withQueryString() }} --}}
-                  {{-- <ul class="pagination pagination-sm m-0 float-right">
-                    <li class="page-item"><a class="page-link" href="#">&laquo;</a></li>
-                    <li class="page-item"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item"><a class="page-link" href="#">&raquo;</a></li>
-                  </ul> --}}
+                  {{ $products->links() }}
                 </div>
               </div>
             </div>
@@ -108,12 +85,4 @@
     </section>
     <!-- /.content -->
   </div>
-@endsection
-
-@section('my-script')
-  <script>
-    $(document).ready(function(){
-        let table = new DataTable('#table-product-category');
-    });
-  </script>
 @endsection

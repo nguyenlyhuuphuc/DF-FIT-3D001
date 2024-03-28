@@ -19,4 +19,5 @@ Route::prefix('admin/product_category')
     Route::post('slug', 'slug')->name('slug');
 });
 
+/** Product */
 Route::resource('admin/product', ProductController::class,  ['as' => 'admin'])->middleware('check.user.is.admin');
