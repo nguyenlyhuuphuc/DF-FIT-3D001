@@ -61,10 +61,20 @@
                           {{-- <td>{{ $product->product_category_name }}</td> --}}
                           <td>{{ $product->status ? 'Show' : 'Hide' }}</td>
                           <td>
-                            <form action="{{ route('admin.product_category.destroy', ['id' => $product->id]) }}" method="post">
+                            <form action="{{ route('admin.product.destroy', ['product' => $product->id]) }}" method="post">
+                              @method('delete')
                               @csrf
                               <button onclick="return confirm('Are you sure ?')" class="btn btn-danger" type="submit">Delete</button>
                             </form>
+                            
+                            @if($product->trashed())
+                            <form action="{{ route('admin.product.restore', ['product' => $product->id]) }}" method="post">
+                              @csrf
+                              <button type="submit" class="btn btn-success">Restore</button>
+                            </form>
+                            @endif
+
+
                             <a href="{{ route('admin.product_category.detail', ['id' => $product->id]) }}" class="btn btn-primary">Edit</a>
                           </td>
                         </tr>

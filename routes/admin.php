@@ -21,3 +21,5 @@ Route::prefix('admin/product_category')
 
 /** Product */
 Route::resource('admin/product', ProductController::class,  ['as' => 'admin'])->middleware('check.user.is.admin');
+Route::post('admin/product/image_upload', [ProductController::class, 'storeImage'])->name('admin.product.image.upload');
+Route::post('admin/product/restore/{product}', [ProductController::class, 'restore'])->name('admin.product.restore');

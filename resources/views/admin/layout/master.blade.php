@@ -88,6 +88,8 @@
 
 <script src="//cdn.datatables.net/2.0.3/js/dataTables.min.js"></script>
 
+<script src="https://cdn.ckeditor.com/ckeditor5/41.2.1/classic/ckeditor.js"></script>
+
 @yield('my-script')
 </body>
 </html>
