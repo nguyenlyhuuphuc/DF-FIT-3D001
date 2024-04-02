@@ -43,8 +43,9 @@
     <script src="{{ asset('client_asset/js/jquery.slicknav.js') }}"></script>
     <script src="{{ asset('client_asset/js/mixitup.min.js') }}"></script>
     <script src="{{ asset('client_asset/js/owl.carousel.min.js') }}"></script>
-    <script src="{{ asset('client_asset/js/main.js') }}"></script>
-
+    <script src="{{ asset('client_asset/js/main.js') }}"></script>  
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    @yield('my-script')
 
 
 </body>

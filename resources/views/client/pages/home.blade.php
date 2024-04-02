@@ -64,7 +64,7 @@
                             <ul class="featured__item__pic__hover">
                                 <li><a href="#"><i class="fa fa-heart"></i></a></li>
                                 <li><a href="#"><i class="fa fa-retweet"></i></a></li>
-                                <li><a href="#"><i class="fa fa-shopping-cart"></i></a></li>
+                                <li class='btn-add-to-cart' data-url="{{ route('cart.add.product', ['product' => $product->id]) }}"><a href="#"><i class="fa fa-shopping-cart"></i></a></li>
                             </ul>
                         </div>
                         <div class="featured__item__text">
@@ -362,4 +362,29 @@
     </div>
 </section>
 <!-- Blog Section End -->
+@endsection
+
+@section('my-script')
+    <script>
+        $(document).ready(function(){
+            $('.btn-add-to-cart').on('click', function(event){
+                event.preventDefault();
+                var url = $(this).data('url');
+
+                $.ajax({
+                    url: url, //action of form
+                    type: 'GET', //method of form
+                    success: function(data){
+
+                        $('#total-item-cart').html(data.totalItem);
+
+                        Swal.fire({
+                            icon: "success",
+                            text: data.message,
+                        });
+                    }
+                });
+            });
+        });
+    </script>
 @endsection
