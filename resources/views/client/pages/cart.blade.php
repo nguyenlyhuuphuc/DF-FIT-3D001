@@ -20,8 +20,8 @@
                             @php 
                                 $totalPrice = 0;
                             @endphp
-                            @foreach ($cart as $item)
-                                <tr>
+                            @foreach ($cart as $id => $item)
+                                <tr id="tr-{{ $id }}">
                                     <td class="shoping__cart__item">
                                         <img src="img/cart/cart-1.jpg" alt="">
                                         <h5>{{ $item['name'] }}</h5>
@@ -44,7 +44,7 @@
                                         ${{ number_format($total, 2) }}
                                     </td>
                                     <td class="shoping__cart__item__close">
-                                        <span class="icon_close"></span>
+                                        <span data-id="{{ $id }}" data-url="{{ route('cart.remove.product', ['product' => $id]) }}" class="icon_close"></span>
                                     </td>
                                 </tr>
                             @endforeach
@@ -85,4 +85,28 @@
         </div>
     </div>
 </section>
+@endsection
+
+@section('my-script')
+<script>
+    $(document).ready(function(){
+        $('.icon_close').on('click', function(event){
+            var url = $(this).data('url');
+            var id = $(this).data('id');
+
+            $.ajax({
+                url: url, //action of form
+                type: 'GET', //method of form
+                success: function(data){
+                    $('#tr-'+id).empty();
+
+                    Swal.fire({
+                        icon: "success",
+                        text: data.message,
+                    });
+                }
+            });
+        });
+    });
+</script>
 @endsection

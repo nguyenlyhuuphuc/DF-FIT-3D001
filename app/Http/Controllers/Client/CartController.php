@@ -29,6 +29,18 @@ class CartController extends Controller
         ]);
     }
 
+    public function remove($productId){
+        $cart = session()->get('cart', []);
+
+        if(isset($cart[$productId])){
+            unset($cart[$productId]);
+        }
+
+        session()->put('cart', $cart);
+
+        return response()->json(['message' => 'Remove product success!',]);
+    }
+
     public function index(){
         $cart = session()->get('cart', []);
         

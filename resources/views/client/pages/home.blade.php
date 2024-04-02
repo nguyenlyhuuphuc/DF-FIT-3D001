@@ -382,6 +382,11 @@
                             icon: "success",
                             text: data.message,
                         });
+                    },
+                    statusCode: {
+                        401: function() {
+                            window.location.href = "{{ route('login') }}";
+                        }
                     }
                 });
             });
