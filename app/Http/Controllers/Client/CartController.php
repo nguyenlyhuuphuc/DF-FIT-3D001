@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class CartController extends Controller
 {
-    public function add($productId){
+    public function add($productId, $qty = 1){
         $cart = session()->get('cart', []);
 
         $product = Product::find($productId);
@@ -17,7 +17,7 @@ class CartController extends Controller
             'name' => $product->name,
             'price' => $product->price,
             'image_url' => asset('images/'.$product->image),
-            'qty' => ($cart[$product->id]['qty'] ?? 0) + 1
+            'qty' => ($cart[$product->id]['qty'] ?? 0) + $qty
         ];
 
         //Add cart into session
