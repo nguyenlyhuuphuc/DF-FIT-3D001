@@ -4,11 +4,17 @@ namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PlaceOrderRequest;
+use App\Mail\EmailConfirmOrderAdmin;
+use App\Mail\EmailConfirmOrderCustomer;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderPaymentMethod;
+use App\Models\Product;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class OrderController extends Controller
 {
@@ -19,50 +25,71 @@ class OrderController extends Controller
     }
 
     public function placeOrder(PlaceOrderRequest $request){
-        //Save Order
-        $order = new Order();
-        $order->name = $request->name;
-        $order->address = $request->address;
-        $order->note = $request->note;
-        $order->save(); //insert
 
-        //Save Order Items
-        $cart = session()->get('cart', []);
-        $totalPrice = 0;
-        if(!empty($cart)){
-            foreach ($cart as $key => $value) {
+        DB::beginTransaction();
+        try{
+            $totalPrice = 0;
+            foreach (session()->get('cart', []) as $key => $value) {
                 $totalPrice += (float)$value['qty'] * (float)$value['price'];
-                $orderItem = new OrderItem();        
-                $orderItem->price = $value['price'];
-                $orderItem->qty = $value['qty'];
-                $orderItem->name = $value['name'];
-                $orderItem->image = $value['image_url'];
-                $orderItem->product_id = $key;
-                $orderItem->order_id = $order->id;
-                $orderItem->save();
             }
-        }
-
-        $order->total = $totalPrice;
-        $order->save(); //update
-        
-
-        //Save ORder Payment Method
-        $orderPaymentMethod = new OrderPaymentMethod();
-        $orderPaymentMethod->payment_method = $request->payment_method;
-        $orderPaymentMethod->status = 'pending';
-        $orderPaymentMethod->order_id = $order->id;
-        $orderPaymentMethod->total = $totalPrice;
-        $orderPaymentMethod->save();
-
-        //Reset Cart
-        session()->put('cart', []);
-
-        //Update phone of User
-        $user = Auth::check() ? Auth::user() : null;
-        if(!is_null($user)){
+                
+            //Save Order
+            $order = new Order();
+            $order->user_id = Auth::user()->id;
+            $order->address = $request->address;
+            $order->note = $request->note;
+            $order->total = $totalPrice;
+            $order->save();
+    
+            //Save Order Items
+            $cart = session()->get('cart', []);
+            if(!empty($cart)){
+                foreach ($cart as $key => $value) {
+                    $orderItem = new OrderItem();        
+                    $orderItem->price = $value['price'];
+                    $orderItem->qty = $value['qty'];
+                    $orderItem->name = $value['name'];
+                    $orderItem->image = $value['image_url'];
+                    $orderItem->product_id = $key;
+                    $orderItem->order_id = $order->id;
+                    $orderItem->save();
+                }
+            }
+            
+            //Save Order Payment Method
+            $orderPaymentMethod = new OrderPaymentMethod();
+            $orderPaymentMethod->payment_method = $request->payment_method;
+            $orderPaymentMethod->status = 'pending';
+            $orderPaymentMethod->order_id = $order->id;
+            $orderPaymentMethod->total = $totalPrice;
+            $orderPaymentMethod->save();
+    
+            //Update phone of User
+            $user = Auth::user();
             $user->phone = $request->phone;
             $user->save();
+    
+            //Reset Cart
+            session()->put('cart', []);
+
+            //Send email to Customer
+            Mail::to('nguyenlyhuuphucwork@gmail.com')->send(new EmailConfirmOrderCustomer($order));
+            //Send email to Admin
+            Mail::to('nguyenlyhuuphucwork@gmail.com')->send(new EmailConfirmOrderAdmin($order));
+            //Minus qty of product
+            foreach($order->orderItems as $item){
+                $product = Product::find($item->product_id);
+                $product->qty = (int)$product->qty - (int)$item->qty;
+                $product->save();
+            }
+
+            DB::commit();
+
+            return redirect()->route('client.index')->with('msg', 'Order thanh cong');
+        }catch(Exception $e){
+            DB::rollBack();
+            // throw new Exception($e->getMessage());
+            return redirect()->route('client.index')->with('msg', 'Order that bai');
         }
     }
 }
