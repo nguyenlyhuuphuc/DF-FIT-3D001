@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProductCategoryController;
 use App\Http\Controllers\Admin\ProductController;
 use Illuminate\Support\Facades\Route;
@@ -23,3 +24,4 @@ Route::prefix('admin/product_category')
 Route::resource('admin/product', ProductController::class,  ['as' => 'admin'])->middleware('check.user.is.admin');
 Route::post('admin/product/image_upload', [ProductController::class, 'storeImage'])->name('admin.product.image.upload');
 Route::post('admin/product/restore/{product}', [ProductController::class, 'restore'])->name('admin.product.restore');
+Route::get('admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard')->middleware('check.user.is.admin');

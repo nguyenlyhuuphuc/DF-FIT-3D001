@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Client;
 
+use App\Events\OrderSuccessEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PlaceOrderRequest;
 use App\Mail\EmailConfirmOrderAdmin;
@@ -14,6 +15,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
 
 class OrderController extends Controller
@@ -72,16 +74,7 @@ class OrderController extends Controller
             //Reset Cart
             session()->put('cart', []);
 
-            //Send email to Customer
-            Mail::to('nguyenlyhuuphucwork@gmail.com')->send(new EmailConfirmOrderCustomer($order));
-            //Send email to Admin
-            Mail::to('nguyenlyhuuphucwork@gmail.com')->send(new EmailConfirmOrderAdmin($order));
-            //Minus qty of product
-            foreach($order->orderItems as $item){
-                $product = Product::find($item->product_id);
-                $product->qty = (int)$product->qty - (int)$item->qty;
-                $product->save();
-            }
+            event(new OrderSuccessEvent($order)); //public event
 
             DB::commit();
 

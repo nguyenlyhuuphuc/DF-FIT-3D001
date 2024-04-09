@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Client\CartController;
+use App\Http\Controllers\Client\GoogleController;
 use App\Http\Controllers\Client\HomeController;
 use App\Http\Controllers\Client\OrderController;
 use App\Http\Controllers\Client\ProductController;
@@ -19,6 +20,8 @@ Route::get('product/{slug}', [ProductController::class, 'detail'])->name('produc
 Route::get('checkout', [OrderController::class, 'index'])->name('order.checkout')->middleware('auth');
 Route::post('place-order', [OrderController::class, 'placeOrder'])->name('order.place-order')->middleware('auth');
 
+Route::get('google/redirect', [GoogleController::class, 'redirect'])->name('google.redirect');
+Route::get('google/callback', [GoogleController::class, 'callback'])->name('google.callback');
 
 Route::get('test-send-email', function (){
     $order = \App\Models\Order::find(8);
