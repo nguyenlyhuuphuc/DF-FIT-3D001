@@ -41,6 +41,7 @@ class OrderController extends Controller
             $order->address = $request->address;
             $order->note = $request->note;
             $order->total = $totalPrice;
+            $order->status = 'pending';
             $order->save();
     
             //Save Order Items
@@ -76,6 +77,12 @@ class OrderController extends Controller
 
             event(new OrderSuccessEvent($order)); //public event
 
+            if(in_array($request->payment_method, ['vnpay_atm', 'vnpay_emv'])){
+                $url = $this->proccessWithVnPay($order, $request->payment_method);
+                
+                return redirect()->away($url);
+            }
+            
             DB::commit();
 
             return redirect()->route('client.index')->with('msg', 'Order thanh cong');
@@ -84,5 +91,58 @@ class OrderController extends Controller
             // throw new Exception($e->getMessage());
             return redirect()->route('client.index')->with('msg', 'Order that bai');
         }
+    }
+
+    public function proccessWithVnPay(Order $order,string $payment): string{
+        date_default_timezone_set('Asia/Ho_Chi_Minh');
+
+        $vnp_TxnRef = (string) $order->id; //Mã giao dịch thanh toán tham chiếu của merchant
+        $vnp_Amount =  $order->total; // Số tiền thanh toán
+        $vnp_Locale = 'vn'; //Ngôn ngữ chuyển hướng thanh toán
+        $vnp_BankCode = ($payment === 'vnpay_atm') ? 'VNBANK' : 'INTCARD';
+        $vnp_IpAddr = $_SERVER['REMOTE_ADDR']; //IP Khách hàng thanh toán
+
+        $startTime = date("YmdHis");
+        $expire = date('YmdHis',strtotime('+15 minutes',strtotime($startTime)));
+
+        $inputData = array(
+            "vnp_Version" => "2.1.0",
+            "vnp_TmnCode" => env('VNP_TMNCODE'),
+            "vnp_Amount" =>  (string) ($vnp_Amount * 100),
+            "vnp_Command" => "pay",
+            "vnp_CreateDate" => date('YmdHis'),
+            "vnp_CurrCode" => "VND",
+            "vnp_IpAddr" => $vnp_IpAddr,
+            "vnp_Locale" => $vnp_Locale,
+            "vnp_OrderInfo" => "Thanh toan GD: $vnp_TxnRef",
+            "vnp_OrderType" => "other",
+            "vnp_ReturnUrl" => env('VNP_RETURNURL'),
+            "vnp_TxnRef" => $vnp_TxnRef,
+            "vnp_ExpireDate" => $expire
+        );
+
+        if (isset($vnp_BankCode) && $vnp_BankCode != "") {
+            $inputData['vnp_BankCode'] = $vnp_BankCode;
+        }
+
+        ksort($inputData);
+        $query = "";
+        $i = 0;
+        $hashdata = "";
+        foreach ($inputData as $key => $value) {
+            if ($i == 1) {
+                $hashdata .= '&' . urlencode($key) . "=" . urlencode($value);
+            } else {
+                $hashdata .= urlencode($key) . "=" . urlencode($value);
+                $i = 1;
+            }
+            $query .= urlencode($key) . "=" . urlencode($value) . '&';
+        }
+
+        $vnp_Url = env('VNP_URL') . "?" . $query;
+        $vnpSecureHash =   hash_hmac('sha512', $hashdata, env('VNP_HASHSRET'));
+        $vnp_Url .= 'vnp_SecureHash=' . $vnpSecureHash;
+
+        return $vnp_Url;
     }
 }

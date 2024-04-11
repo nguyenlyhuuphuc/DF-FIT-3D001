@@ -91,8 +91,15 @@
                             </div>
                             <div class="checkout__input__checkbox">
                                 <label for="paypal">
-                                    VNPay
-                                    <input name="payment_method" type="checkbox" id="paypal" value="vnpay">
+                                    VNPay ATM
+                                    <input name="payment_method" type="checkbox" id="paypal" value="vnpay_atm">
+                                    <span class="checkmark"></span>
+                                </label>
+                            </div>
+                            <div class="checkout__input__checkbox">
+                                <label for="paypal">
+                                    VNPay EMV
+                                    <input name="payment_method" type="checkbox" id="paypal" value="vnpay_emv">
                                     <span class="checkmark"></span>
                                 </label>
                             </div>

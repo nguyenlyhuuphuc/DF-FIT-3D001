@@ -23,8 +23,8 @@ class EventServiceProvider extends ServiceProvider
             SendEmailVerificationNotification::class,
         ],
         OrderSuccessEvent::class => [
-            SendMailToAdminListener::class,
-            SendMailToCustomerListener::class,
+            // SendMailToAdminListener::class,
+            // SendMailToCustomerListener::class,
             MinusQtyOfProductListener::class
         ]
     ];
