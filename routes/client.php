@@ -23,6 +23,8 @@ Route::post('place-order', [OrderController::class, 'placeOrder'])->name('order.
 Route::get('google/redirect', [GoogleController::class, 'redirect'])->name('google.redirect');
 Route::get('google/callback', [GoogleController::class, 'callback'])->name('google.callback');
 
+Route::get('vnpay/callback', [OrderController::class, 'vnpayCallback'])->name('vnpay.callback');
+
 Route::get('test-send-email', function (){
     $order = \App\Models\Order::find(8);
     // dd($order->user->email);

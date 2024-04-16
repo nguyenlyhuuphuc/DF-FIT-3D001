@@ -71,20 +71,20 @@ class OrderController extends Controller
             $user = Auth::user();
             $user->phone = $request->phone;
             $user->save();
-    
+
             //Reset Cart
             session()->put('cart', []);
 
-            event(new OrderSuccessEvent($order)); //public event
+            DB::commit();
 
             if(in_array($request->payment_method, ['vnpay_atm', 'vnpay_emv'])){
                 $url = $this->proccessWithVnPay($order, $request->payment_method);
                 
                 return redirect()->away($url);
             }
-            
-            DB::commit();
-
+            // payment method = cod
+            event(new OrderSuccessEvent($order)); //public event
+        
             return redirect()->route('client.index')->with('msg', 'Order thanh cong');
         }catch(Exception $e){
             DB::rollBack();
@@ -108,7 +108,7 @@ class OrderController extends Controller
         $inputData = array(
             "vnp_Version" => "2.1.0",
             "vnp_TmnCode" => env('VNP_TMNCODE'),
-            "vnp_Amount" =>  (string) ($vnp_Amount * 100),
+            "vnp_Amount" =>  1100000,
             "vnp_Command" => "pay",
             "vnp_CreateDate" => date('YmdHis'),
             "vnp_CurrCode" => "VND",
@@ -145,4 +145,41 @@ class OrderController extends Controller
 
         return $vnp_Url;
     }
+
+    public function vnpayCallback(Request $request){
+        $hashMap = [
+            '00' => 'Giao dịch thành công',
+            '07' => 'Trừ tiền thành công. Giao dịch bị nghi ngờ (liên quan tới lừa đảo, giao dịch bất thường).',
+            '09' => 'Giao dịch không thành công do: Thẻ/Tài khoản của khách hàng chưa đăng ký dịch vụ InternetBanking tại ngân hàng.',
+            '10' => 'Giao dịch không thành công do: Khách hàng xác thực thông tin thẻ/tài khoản không đúng quá 3 lần'
+        ];
+        
+        $orderId = $request->get('vnp_TxnRef');
+
+        $order = Order::findOrFailed($orderId);
+
+        if($request->get('vnp_ResponseCode') !== "00"){
+            $orderPaymentMethod = $order->orderPaymentMethods[0];
+            $orderPaymentMethod->status = 'failed';
+            $orderPaymentMethod->reason = $hashMap[$request->get('vnp_ResponseCode')] ?? null;
+            $orderPaymentMethod->save();
+            
+            $order->status = 'canceled';
+            $order->save();
+
+            return;
+        }
+
+        //Update order payment methods
+        $orderPaymentMethod = $order->orderPaymentMethods[0];
+        $orderPaymentMethod->status = 'success';
+        $orderPaymentMethod->save();
+        
+        //Update order status
+        $order->status = 'done';
+        $order->save();
+
+        event(new OrderSuccessEvent($order)); //public event
+    }
 }
+
